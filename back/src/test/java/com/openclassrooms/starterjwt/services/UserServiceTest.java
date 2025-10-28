@@ -13,22 +13,24 @@ public class UserServiceTest {
     @Test
     public void testDelete() {
         // given
+        Long userId = 1L;
 
         // when
-        classUnderTest.delete(1L);
+        classUnderTest.delete(userId);
 
         // then
-        org.mockito.Mockito.verify(mockUserRepository).deleteById(1L);
+        org.mockito.Mockito.verify(mockUserRepository).deleteById(userId);
     }
 
     @Test
     public void testFindById() {
         // given
+        Long userId = 1L;
 
         // when
-        classUnderTest.findById(1L);
+        classUnderTest.findById(userId);
 
         // then
-        org.mockito.Mockito.verify(mockUserRepository).findById(1L);
+        org.mockito.Mockito.verify(mockUserRepository).findById(userId);
     }
 }
