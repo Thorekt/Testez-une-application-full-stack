@@ -11,7 +11,8 @@ import org.mockito.Mockito;
 
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
-
+import com.openclassrooms.starterjwt.exception.BadRequestException;
+import com.openclassrooms.starterjwt.exception.NotFoundException;
 import com.openclassrooms.starterjwt.models.Session;
 import com.openclassrooms.starterjwt.models.User;
 
@@ -124,4 +125,176 @@ public class SessionServiceTest {
         Mockito.verify(mockSessionRepository).save(Mockito.any(Session.class));
     }
 
+    @Test
+    public void testParticipateTrownNotFoundExceptionWhenSessionNotFound() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.empty());
+
+        // When
+
+        try {
+            classUnderTest.participate(sessionId, userId);
+        } catch (Exception e) {
+            // Then
+            assertEquals(NotFoundException.class, e.getClass());
+        }
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+        Mockito.verify(mockUserRepository).findById(userId);
+    }
+
+    @Test
+    public void testParticipateTrownNotFoundExceptionWhenUserNotFound() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        Session mockedSession = Session.builder()
+                .id(sessionId)
+                .users(new java.util.ArrayList<>())
+                .build();
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedSession));
+
+        when(mockUserRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.empty());
+
+        // When
+
+        try {
+            classUnderTest.participate(sessionId, userId);
+        } catch (Exception e) {
+            // Then
+            assertEquals(NotFoundException.class, e.getClass());
+
+        }
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+        Mockito.verify(mockUserRepository).findById(userId);
+    }
+
+    @Test
+    public void testParticipateTrownBadRequestExceptionWhenAlreadyParticipate() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        User mockedUser = User.builder()
+                .id(userId)
+                .email("user@example.com")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .admin(false)
+                .build();
+
+        Session mockedSession = Session.builder()
+                .id(sessionId)
+                .users(new java.util.ArrayList<>(java.util.List.of(mockedUser)))
+                .build();
+
+        when(mockUserRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedUser));
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedSession));
+
+        // When
+        try {
+            classUnderTest.participate(sessionId, userId);
+        } catch (Exception e) {
+            // Then
+            assertEquals(BadRequestException.class, e.getClass());
+        }
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+        Mockito.verify(mockUserRepository).findById(userId);
+    }
+
+    @Test
+    public void testNoLongerParticipate() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+        User mockedUser = User.builder()
+                .id(userId)
+                .email("user@example.com")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .admin(false)
+                .build();
+
+        Session mockedSession = Session.builder()
+                .id(sessionId)
+                .users(new java.util.ArrayList<>(java.util.List.of(mockedUser)))
+                .build();
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedSession));
+
+        // When
+        classUnderTest.noLongerParticipate(sessionId, userId);
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+        Mockito.verify(mockSessionRepository).save(Mockito.any(Session.class));
+        ;
+    }
+
+    @Test
+    public void testNoLongerParticipateTrownNotFoundExceptionWhenSessionNotFound() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.empty());
+
+        // When
+
+        try {
+            classUnderTest.noLongerParticipate(sessionId, userId);
+        } catch (Exception e) {
+            // Then
+            assertEquals(NotFoundException.class, e.getClass());
+        }
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+    }
+
+    @Test
+    public void testNoLongerParticipateTrownBadRequestExceptionWhenNotParticipate() {
+        // Given
+        Long sessionId = 1L;
+        Long userId = 2L;
+
+        Session mockedSession = Session.builder()
+                .id(sessionId)
+                .users(new java.util.ArrayList<>())
+                .build();
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedSession));
+
+        // When
+        try {
+            classUnderTest.noLongerParticipate(sessionId, userId);
+        } catch (Exception e) {
+            // Then
+            assertEquals(BadRequestException.class, e.getClass());
+        }
+
+        // Then
+        Mockito.verify(mockSessionRepository).findById(sessionId);
+    }
 }
