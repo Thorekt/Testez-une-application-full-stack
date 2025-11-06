@@ -17,8 +17,8 @@ import com.openclassrooms.starterjwt.models.User;
 import com.openclassrooms.starterjwt.services.UserService;
 
 public class UserControllerTest {
-    UserService mockUserService = org.mockito.Mockito.mock(UserService.class);
-    UserMapper mockUserMapper = org.mockito.Mockito.mock(UserMapper.class);
+    UserService mockUserService = Mockito.mock(UserService.class);
+    UserMapper mockUserMapper = Mockito.mock(UserMapper.class);
 
     UserController classUnderTest = new UserController(mockUserService, mockUserMapper);
 
