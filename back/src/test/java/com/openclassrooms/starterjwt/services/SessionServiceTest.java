@@ -1,12 +1,10 @@
 package com.openclassrooms.starterjwt.services;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
-import org.mapstruct.control.MappingControl.Use;
 import org.mockito.Mockito;
 
 import com.openclassrooms.starterjwt.repository.SessionRepository;
