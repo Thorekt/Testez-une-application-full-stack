@@ -2,14 +2,18 @@ package com.openclassrooms.starterjwt.services;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.mapstruct.control.MappingControl.Use;
 import org.mockito.Mockito;
 
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
 
 import com.openclassrooms.starterjwt.models.Session;
+import com.openclassrooms.starterjwt.models.User;
 
 public class SessionServiceTest {
     SessionRepository mockSessionRepository = org.mockito.Mockito.mock(SessionRepository.class);
@@ -90,6 +94,26 @@ public class SessionServiceTest {
         // Given
         Long sessionId = 1L;
         Long userId = 2L;
+
+        User mockedUser = User.builder()
+                .id(userId)
+                .email("user@example.com")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .admin(false)
+                .build();
+
+        Session mockedSession = Session.builder()
+                .id(sessionId)
+                .users(new java.util.ArrayList<>())
+                .build();
+
+        when(mockUserRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedUser));
+
+        when(mockSessionRepository.findById(any(Long.class)))
+                .thenReturn(java.util.Optional.of(mockedSession));
 
         // When
         classUnderTest.participate(sessionId, userId);
