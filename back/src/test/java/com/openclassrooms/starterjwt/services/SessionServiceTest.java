@@ -245,9 +245,10 @@ public class SessionServiceTest {
         classUnderTest.noLongerParticipate(sessionId, userId);
 
         // Then
+        assertEquals(0, mockedSession.getUsers().size());
         Mockito.verify(mockSessionRepository).findById(sessionId);
         Mockito.verify(mockSessionRepository).save(Mockito.any(Session.class));
-        ;
+
     }
 
     @Test
@@ -297,4 +298,5 @@ public class SessionServiceTest {
         // Then
         Mockito.verify(mockSessionRepository).findById(sessionId);
     }
+
 }
