@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
-import com.openclassrooms.starterjwt.security.jwt.AuthEntryPointJwt;
+import com.openclassrooms.starterjwt.security.jwt.AuthEntryPointJwtTest;
 import com.openclassrooms.starterjwt.security.jwt.AuthTokenFilter;
 import com.openclassrooms.starterjwt.security.services.UserDetailsServiceImpl;
 
@@ -29,7 +29,7 @@ public class WebSecurityConfig {
   private UserDetailsServiceImpl userDetailsService;
 
   @Autowired
-  private AuthEntryPointJwt unauthorizedHandler;
+  private AuthEntryPointJwtTest unauthorizedHandler;
 
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
