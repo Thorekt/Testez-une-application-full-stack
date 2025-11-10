@@ -1,11 +1,14 @@
 package com.openclassrooms.starterjwt.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.mapstruct.control.MappingControl.Use;
 import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 
 import com.openclassrooms.starterjwt.repository.SessionRepository;
 import com.openclassrooms.starterjwt.repository.UserRepository;
@@ -222,6 +225,7 @@ public class SessionServiceTest {
         // Given
         Long sessionId = 1L;
         Long userId = 2L;
+        Long anotherUserId = 3L;
         User mockedUser = User.builder()
                 .id(userId)
                 .email("user@example.com")
@@ -231,9 +235,18 @@ public class SessionServiceTest {
                 .admin(false)
                 .build();
 
+        User anotherMockedUser = User.builder()
+                .id(anotherUserId)
+                .email("user@example.com")
+                .firstName("John")
+                .lastName("Doe")
+                .password("password")
+                .admin(false)
+                .build();
+
         Session mockedSession = Session.builder()
                 .id(sessionId)
-                .users(new java.util.ArrayList<>(java.util.List.of(mockedUser)))
+                .users(new java.util.ArrayList<>(java.util.List.of(mockedUser, anotherMockedUser)))
                 .build();
 
         when(mockSessionRepository.findById(any(Long.class)))
@@ -243,9 +256,14 @@ public class SessionServiceTest {
         classUnderTest.noLongerParticipate(sessionId, userId);
 
         // Then
-        assertEquals(0, mockedSession.getUsers().size());
+        ArgumentCaptor<Session> captor = ArgumentCaptor.forClass(Session.class);
+        Mockito.verify(mockSessionRepository).save(captor.capture());
         Mockito.verify(mockSessionRepository).findById(sessionId);
-        Mockito.verify(mockSessionRepository).save(Mockito.any(Session.class));
+        Session saved = captor.getValue();
+        // verifie que l'utilisateur a été supprimé de la session
+        assertTrue(saved.getUsers().stream().noneMatch(u -> u.getId().equals(userId)));
+        // verifie que l'autre utilisateur est toujours dans la session
+        assertTrue(saved.getUsers().stream().anyMatch(u -> u.getId().equals(anotherUserId)));
 
     }
 
