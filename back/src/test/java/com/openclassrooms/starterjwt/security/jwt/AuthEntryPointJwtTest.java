@@ -38,7 +38,7 @@ public class AuthEntryPointJwtTest {
         when(mockedRequest.getServletPath()).thenReturn("/api/test");
         when(mockedAuthException.getMessage()).thenReturn("Invalid token");
 
-        // Capture output written to response.getOutputStream()
+        // Ceci permet de capturer ce qui est écrit dans le flux de sortie
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ServletOutputStream servletOutputStream = new ServletOutputStream() {
             @Override
@@ -53,7 +53,7 @@ public class AuthEntryPointJwtTest {
 
             @Override
             public void setWriteListener(WriteListener writeListener) {
-                // no-op
+                // inutilisé dans le test
             }
         };
         when(mockedResponse.getOutputStream()).thenReturn(servletOutputStream);
@@ -61,11 +61,11 @@ public class AuthEntryPointJwtTest {
         // When
         classUnderTest.commence(mockedRequest, mockedResponse, mockedAuthException);
 
-        // Then: verify headers/status set
+        // Then: verifier les status et content type
         verify(mockedResponse).setContentType(MediaType.APPLICATION_JSON_VALUE);
         verify(mockedResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        // Parse JSON written to the output stream and assert fields
+        // ceci permet de vérifier le contenu JSON écrit dans le flux de sortie
         ObjectMapper mapper = new ObjectMapper();
         byte[] jsonBytes = byteArrayOutputStream.toByteArray();
         assertTrue(jsonBytes.length > 0, "Expected JSON body to be written");
