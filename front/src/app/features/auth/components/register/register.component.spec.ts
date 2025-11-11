@@ -37,4 +37,59 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should submit redirect after register success', () => {
+    // Given
+    const registerRequest = {
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User'
+    };
+
+    component.form.setValue(registerRequest);
+
+    const registerSpy = jest.spyOn(component['authService'], 'register').mockImplementation(() => {
+      return {
+        subscribe: (obj: any) => {
+          obj.next({});
+        }
+      } as any;
+    });
+
+    const routerNavigateSpy = jest.spyOn(component['router'], 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    // When
+    component.submit();
+
+    // Then
+    expect(registerSpy).toHaveBeenCalledWith(registerRequest);
+    expect(routerNavigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should set onError to true on register error', () => {
+    // Given
+    const registerRequest = {
+      email: 'test@example.com',
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User'
+    };
+    component.form.setValue(registerRequest);
+
+    const registerSpy = jest.spyOn(component['authService'], 'register').mockImplementation(() => {
+      return {
+        subscribe: (obj: any) => {
+          obj.error({});
+        }
+      } as any;
+    });
+
+    // When
+    component.submit();
+
+    // Then
+    expect(registerSpy).toHaveBeenCalledWith(registerRequest);
+    expect(component.onError).toBe(true);
+  });
 });
