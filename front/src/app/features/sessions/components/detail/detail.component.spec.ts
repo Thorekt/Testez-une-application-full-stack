@@ -72,5 +72,37 @@ describe('DetailComponent', () => {
     expect(snackBarSpy).toHaveBeenCalled();
     expect(routerNavigateSpy).toHaveBeenCalledWith(['sessions']);
   });
+
+  it('should participate to session', () => {
+    // Given
+    const participateSpy = jest.spyOn(component['sessionApiService'], 'participate').mockReturnValueOnce({
+      subscribe: (callback: any) => callback({})
+    } as any);
+    const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession').mockImplementation(() => {});
+    
+    // When
+    component.participate();
+
+    // Then
+    fixture.detectChanges();
+    expect(participateSpy).toHaveBeenCalledWith(component.sessionId, component.userId);
+    expect(fetchSessionSpy).toHaveBeenCalled();
+  });
+
+  it('should unParticipate to session', () => {
+    // Given
+    const unParticipateSpy = jest.spyOn(component['sessionApiService'], 'unParticipate').mockReturnValueOnce({
+      subscribe: (callback: any) => callback({})
+    } as any);
+    const fetchSessionSpy = jest.spyOn(component as any, 'fetchSession').mockImplementation(() => {});
+
+    // When
+    component.unParticipate();
+
+    // Then
+    fixture.detectChanges();
+    expect(unParticipateSpy).toHaveBeenCalledWith(component.sessionId, component.userId);
+    expect(fetchSessionSpy).toHaveBeenCalled();
+  });
 });
 
