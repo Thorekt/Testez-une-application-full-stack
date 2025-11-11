@@ -56,6 +56,21 @@
 			<version>0.9.1</version>
 		</dependency>
 
+		<!-- JAXB API and runtime needed on Java 11+ for DatatypeConverter used by jjwt
+		     Use legacy javax implementation (2.3.x) so io.jsonwebtoken:jjwt:0.9.1
+		     can find javax.xml.bind.DatatypeConverter at runtime. -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>2.3.3</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
