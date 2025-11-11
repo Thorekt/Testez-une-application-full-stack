@@ -26,4 +26,36 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
+
+  it('should $isLogged return observable of boolean', (done) => {
+    // Given
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+
+    // When
+    const isLogged$ = app.$isLogged();
+
+    // Then
+    isLogged$.subscribe(value => {
+      expect(typeof value).toBe('boolean');
+      done();
+    });
+
+  });
+
+  it('should logout call sessionService.logOut and router.navigate', () => {
+    // Given
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const logOutSpy = jest.spyOn(app['sessionService'], 'logOut').mockImplementation(() => {});
+    const routerNavigateSpy = jest.spyOn(app['router'], 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    // When
+    app.logout();
+
+    // Then
+    expect(logOutSpy).toHaveBeenCalled();
+    expect(routerNavigateSpy).toHaveBeenCalledWith(['']);
+  });
+
 });
