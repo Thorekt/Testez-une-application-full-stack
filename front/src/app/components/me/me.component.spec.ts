@@ -17,6 +17,7 @@ describe('MeComponent', () => {
   let fixture: ComponentFixture<MeComponent>;
 
   const mockSessionService = {
+    logOut: () => {},
     sessionInformation: {
       admin: true,
       id: 1
@@ -85,5 +86,23 @@ describe('MeComponent', () => {
     // Then
     expect(backSpy).toHaveBeenCalled();
 
+  });
+
+  it('should delete user', () => {
+    // Given
+    const deleteSpy = jest.spyOn(mockUserService, 'delete').mockReturnValue(of({}));
+    const snackBarSpy = jest.spyOn(component['matSnackBar'], 'open').mockImplementation(() => { return { onAction: () => of({}) } as any; });
+    const logOutSpy = jest.spyOn(component['sessionService'], 'logOut').mockImplementation(() => {});
+    const routerNavigateSpy = jest.spyOn(component['router'], 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    // When
+    component.delete();
+
+    // Then
+    fixture.detectChanges();
+    expect(deleteSpy).toHaveBeenCalledWith('1');
+    expect(snackBarSpy).toHaveBeenCalled();
+    expect(logOutSpy).toHaveBeenCalled();
+    expect(routerNavigateSpy).toHaveBeenCalledWith(['/']);
   });
 });
