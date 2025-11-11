@@ -39,4 +39,60 @@ describe('LoginComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should submit log the session in on successful login and redirect', () => {
+    // Given
+    const loginRequest = {
+      email: 'test@example.com',
+      password: 'password123'
+    };
+
+    component.form.setValue(loginRequest);
+
+
+    const loginSpy = jest.spyOn(component['authService'], 'login').mockImplementation(() => {
+      return {
+        subscribe: (obj: any) => {
+          obj.next({});
+        }
+      } as any;
+    });
+    const sessionServiceLoginSpy = jest.spyOn(component['sessionService'], 'logIn').mockImplementation(() => {});
+    const routerNavigateSpy = jest.spyOn(component['router'], 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    
+    // When
+    component.submit();
+
+    // Then
+    expect(loginSpy).toHaveBeenCalled();
+    expect(sessionServiceLoginSpy).toHaveBeenCalled();
+    expect(routerNavigateSpy).toHaveBeenCalledWith(['/sessions']);
+
+  });
+
+  it('should set onError to true on failed login', () => {
+    // Given
+    const loginRequest = {
+      email: 'test@example.com',
+      password: 'password123'
+    };
+
+    component.form.setValue(loginRequest);
+
+    const loginSpy = jest.spyOn(component['authService'], 'login').mockImplementation(() => {
+      return {
+        subscribe: (obj: any) => {
+          obj.error(new Error('Login failed'));
+        }
+      } as any;
+    });
+
+    // When
+    component.submit();
+
+    // Then
+    expect(loginSpy).toHaveBeenCalled();
+    expect(component.onError).toBe(true);
+  });
 });
