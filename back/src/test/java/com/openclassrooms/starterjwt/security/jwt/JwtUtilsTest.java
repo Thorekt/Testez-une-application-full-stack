@@ -16,6 +16,10 @@ import com.openclassrooms.starterjwt.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.UnsupportedJwtException;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * Tests pour {@link JwtUtils}
@@ -140,6 +144,23 @@ public class JwtUtilsTest {
 
         // Then
         assertFalse(valid);
+    }
+
+    @Test
+    public void testValidateJwtTokenUnsupportedReturnsFalse() {
+        // Given: mock static Jwts.parser() to throw UnsupportedJwtException
+        try (MockedStatic<io.jsonwebtoken.Jwts> mocked = Mockito.mockStatic(Jwts.class)) {
+            JwtParser parser = mock(JwtParser.class);
+            mocked.when(Jwts::parser).thenReturn(parser);
+            when(parser.setSigningKey(anyString())).thenReturn(parser);
+            when(parser.parseClaimsJws(anyString())).thenThrow(new UnsupportedJwtException("unsupported"));
+
+            // When
+            boolean valid = jwtUtils.validateJwtToken("any-token");
+
+            // Then
+            assertFalse(valid);
+        }
     }
 
 }
