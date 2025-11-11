@@ -104,5 +104,32 @@ describe('DetailComponent', () => {
     expect(unParticipateSpy).toHaveBeenCalledWith(component.sessionId, component.userId);
     expect(fetchSessionSpy).toHaveBeenCalled();
   });
+
+  it ('should fetch session and teacher details', () => {
+    // Given
+    const session = {
+      users: [1, 2, 3],
+      teacher_id: 10
+    } as any;
+    const teacher = {
+      name: 'John Doe'
+    } as any;
+    const sessionDetailSpy = jest.spyOn(component['sessionApiService'], 'detail').mockReturnValueOnce({
+      subscribe: (callback: any) => callback(session)
+    } as any);
+    const teacherDetailSpy = jest.spyOn(component['teacherService'], 'detail').mockReturnValueOnce({
+      subscribe: (callback: any) => callback(teacher)
+    } as any);
+
+    // When
+    component.ngOnInit();
+
+    // Then
+    fixture.detectChanges();
+    expect(sessionDetailSpy).toHaveBeenCalledWith(component.sessionId);
+    expect(component.session).toEqual(session);
+    expect(teacherDetailSpy).toHaveBeenCalledWith('10');
+    expect(component.teacher).toEqual(teacher);
+  });
 });
 
