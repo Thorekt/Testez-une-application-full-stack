@@ -1,11 +1,14 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { of } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SessionService } from 'src/app/services/session.service';
+import { UserService } from 'src/app/services/user.service';
 
 import { MeComponent } from './me.component';
 
@@ -19,6 +22,18 @@ describe('MeComponent', () => {
       id: 1
     }
   }
+
+  const mockUser = {
+    id: 1,
+    firstName: 'Test',
+    lastName: 'User',
+    email: 'test@example.com'
+  } as any;
+
+  const mockUserService = {
+    getById: (_id: string) => of(mockUser),
+    delete: (_id: string) => of({})
+  }
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [MeComponent],
@@ -28,9 +43,13 @@ describe('MeComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        RouterTestingModule
       ],
-      providers: [{ provide: SessionService, useValue: mockSessionService }],
+      providers: [
+        { provide: SessionService, useValue: mockSessionService },
+        { provide: UserService, useValue: mockUserService }
+      ],
     })
       .compileComponents();
 
@@ -42,4 +61,17 @@ describe('MeComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should have user defined after ngOnInit', () => {
+    // Given
+
+
+    // When
+    component.ngOnInit();
+
+    // Then
+    fixture.detectChanges();
+    expect(component.user).toBeDefined();
+  });
+
 });
