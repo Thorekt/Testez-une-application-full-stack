@@ -74,4 +74,16 @@ describe('MeComponent', () => {
     expect(component.user).toBeDefined();
   });
 
+  it('should call back method', () => {
+    // Given
+    const backSpy = jest.spyOn(window.history as any, 'back').mockImplementation(() => {});
+
+
+    // When
+    component.back();
+
+    // Then
+    expect(backSpy).toHaveBeenCalled();
+
+  });
 });
