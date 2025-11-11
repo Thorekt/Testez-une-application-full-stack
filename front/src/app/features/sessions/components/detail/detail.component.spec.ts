@@ -54,5 +54,23 @@ describe('DetailComponent', () => {
     // Then
     expect(backSpy).toHaveBeenCalled();
   });
+
+  it('should delete session', () => {
+    // Given
+    const deleteSpy = jest.spyOn(component['sessionApiService'], 'delete').mockReturnValueOnce({
+      subscribe: (callback: any) => callback({})
+    } as any);
+    const snackBarSpy = jest.spyOn(component['matSnackBar'], 'open').mockImplementation(() => ({} as any));
+    const routerNavigateSpy = jest.spyOn(component['router'], 'navigate').mockImplementation(() => Promise.resolve(true));
+
+    // When
+    component.delete();
+
+    // Then
+    fixture.detectChanges();
+    expect(deleteSpy).toHaveBeenCalledWith(component.sessionId);
+    expect(snackBarSpy).toHaveBeenCalled();
+    expect(routerNavigateSpy).toHaveBeenCalledWith(['sessions']);
+  });
 });
 
