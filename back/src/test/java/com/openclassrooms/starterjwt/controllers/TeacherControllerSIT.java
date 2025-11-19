@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -116,4 +117,66 @@ class TeacherControllerSIT {
 
                 assertEquals(401, response.getStatus());
         }
+
+        @Test
+        @WithMockUser
+        public void givenTeacherController_whenFindAll_thenReturnsListOfTeachers() throws Exception {
+                // Given
+                Teacher teacher1 = Teacher.builder()
+                                .id(1L)
+                                .firstName("Jane")
+                                .lastName("Smith")
+                                .build();
+
+                Teacher teacher2 = Teacher.builder()
+                                .id(2L)
+                                .firstName("Bob")
+                                .lastName("Johnson")
+                                .build();
+
+                when(teacherRepository.findAll())
+                                .thenReturn(Arrays.asList(teacher1, teacher2));
+
+                // When
+                MvcResult result = mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/teacher"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+
+                // Then
+                MockHttpServletResponse response = result.getResponse();
+
+                assertEquals(200, response.getStatus());
+                assertTrue(response.getContentAsString().contains("Jane"));
+                assertTrue(response.getContentAsString().contains("Smith"));
+                assertTrue(response.getContentAsString().contains("Bob"));
+                assertTrue(response.getContentAsString().contains("Johnson"));
+
+                verify(teacherRepository).findAll();
+        }
+
+        @Test
+        @WithMockUser
+        public void givenTeacherController_whenFindAll_withNoTeachers_thenReturnsEmptyListOfTeachers()
+                        throws Exception {
+                // Given
+
+                when(teacherRepository.findAll())
+                                .thenReturn(Arrays.asList());
+
+                // When
+                MvcResult result = mockMvc.perform(
+                                MockMvcRequestBuilders.get("/api/teacher"))
+                                .andExpect(MockMvcResultMatchers.status().isOk())
+                                .andReturn();
+
+                // Then
+                MockHttpServletResponse response = result.getResponse();
+
+                assertEquals(200, response.getStatus());
+                assertTrue(response.getContentAsString().contains("[]"));
+
+                verify(teacherRepository).findAll();
+        }
+
 }
