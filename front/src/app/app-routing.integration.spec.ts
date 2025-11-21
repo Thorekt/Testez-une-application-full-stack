@@ -83,3 +83,59 @@ describe('Routing when connected integration', () => {
 	});
 });
 
+describe('Routing when NOT connected integration', () => {
+	let fixture: ComponentFixture<TestHostComponent>;
+	let router: Router;
+
+	beforeEach(async () => {
+		const sessionStub: Partial<SessionService> = { isLogged: false, sessionInformation: undefined };
+		const userStub: Partial<UserService> = { getById: (_: string) => of({ id: 1, username: 'test' } as any) };
+
+		await TestBed.configureTestingModule({
+			imports: [
+				RouterTestingModule,
+				AppRoutingModule,
+				HttpClientTestingModule,
+				NoopAnimationsModule,
+				MatCardModule,
+				MatIconModule,
+				MatSnackBarModule,
+				MatButtonModule,
+				MatFormFieldModule,
+				MatInputModule,
+				MatSelectModule
+			],
+			declarations: [TestHostComponent, MeComponent, NotFoundComponent],
+			providers: [
+				{ provide: SessionService, useValue: sessionStub },
+				{ provide: UserService, useValue: userStub },
+				{ provide: MatSnackBar, useValue: { open: jest.fn() } },
+				AuthGuard,
+				UnauthGuard,
+				{ provide: StyleUtils, useValue: { lookupStyle: () => '', hasWrap: () => false, isFlowDirectionRTL: () => false, applyStyleToElement: () => {}, applyStyleToElements: () => {}, getFlowDirection: () => ['row', false] } }
+			]
+		}).compileComponents();
+
+		router = TestBed.inject(Router);
+
+		fixture = TestBed.createComponent(TestHostComponent);
+		fixture.detectChanges();
+	});
+
+	it('redirects /me to /login when not connected', async () => {
+		await router.navigate(['/me']);
+		await fixture.whenStable();
+		fixture.detectChanges();
+		expect(fixture.nativeElement.querySelector('app-me')).toBeFalsy();
+		expect(router.url).toMatch('/login');
+	});
+
+	it('redirects /sessions to /login when not connected', async () => {
+		await router.navigate(['/sessions']);
+		await fixture.whenStable();
+		fixture.detectChanges();
+		expect(fixture.nativeElement.querySelector('app-list')).toBeFalsy();
+		expect(router.url).toMatch('/login');
+	});
+});
+
