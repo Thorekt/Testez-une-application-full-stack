@@ -25,6 +25,39 @@ import { StyleUtils } from '@angular/flex-layout';
 @Component({ selector: 'test-host', template: '<router-outlet></router-outlet>' })
 class TestHostComponent {}
 
+// Helper: configure TestBed for a given session/user stub and return router+fixture
+async function configureTestModule(sessionStub: Partial<SessionService>, userStub: Partial<UserService>) {
+	await TestBed.configureTestingModule({
+ 		imports: [
+ 			RouterTestingModule,
+ 			AppRoutingModule,
+ 			HttpClientTestingModule,
+ 			NoopAnimationsModule,
+ 			MatCardModule,
+ 			MatIconModule,
+ 			MatSnackBarModule,
+ 			MatButtonModule,
+ 			MatFormFieldModule,
+ 			MatInputModule,
+ 			MatSelectModule
+ 		],
+ 		declarations: [TestHostComponent, MeComponent, NotFoundComponent],
+ 		providers: [
+ 			{ provide: SessionService, useValue: sessionStub },
+ 			{ provide: UserService, useValue: userStub },
+ 			{ provide: MatSnackBar, useValue: { open: jest.fn() } },
+ 			AuthGuard,
+ 			UnauthGuard,
+ 			{ provide: StyleUtils, useValue: { lookupStyle: () => '', hasWrap: () => false, isFlowDirectionRTL: () => false, applyStyleToElement: () => {}, applyStyleToElements: () => {}, getFlowDirection: () => ['row', false] } }
+ 		]
+ 	}).compileComponents();
+
+	const router = TestBed.inject(Router);
+	const fixture = TestBed.createComponent(TestHostComponent);
+	fixture.detectChanges();
+	return { router, fixture };
+}
+
 describe('Routing when connected integration', () => {
 	let fixture: ComponentFixture<TestHostComponent>;
 	let router: Router;
@@ -33,35 +66,7 @@ describe('Routing when connected integration', () => {
 		const sessionStub: Partial<SessionService> = { isLogged: true, sessionInformation: { id: 1 } as any };
 		const userStub: Partial<UserService> = { getById: (_: string) => of({ id: 1, username: 'test' } as any) };
 
-		await TestBed.configureTestingModule({
-			imports: [
-				RouterTestingModule,
-				AppRoutingModule,
-				HttpClientTestingModule,
-				NoopAnimationsModule,
-				MatCardModule,
-				MatIconModule,
-				MatSnackBarModule,
-				MatButtonModule,
-				MatFormFieldModule,
-				MatInputModule,
-				MatSelectModule
-			],
-			declarations: [TestHostComponent, MeComponent, NotFoundComponent],
-			providers: [
-				{ provide: SessionService, useValue: sessionStub },
-				{ provide: UserService, useValue: userStub },
-				{ provide: MatSnackBar, useValue: { open: jest.fn() } },
-				AuthGuard,
-				UnauthGuard,
-				{ provide: StyleUtils, useValue: { lookupStyle: () => '', hasWrap: () => false, isFlowDirectionRTL: () => false, applyStyleToElement: () => {}, applyStyleToElements: () => {}, getFlowDirection: () => ['row', false] } }
-			]
-		}).compileComponents();
-
-		router = TestBed.inject(Router);
-
-		fixture = TestBed.createComponent(TestHostComponent);
-		fixture.detectChanges();
+		({ router, fixture } = await configureTestModule(sessionStub, userStub));
 	});
 
 	it('navigates to /me when connected', async () => {
@@ -91,35 +96,7 @@ describe('Routing when NOT connected integration', () => {
 		const sessionStub: Partial<SessionService> = { isLogged: false, sessionInformation: undefined };
 		const userStub: Partial<UserService> = { getById: (_: string) => of({ id: 1, username: 'test' } as any) };
 
-		await TestBed.configureTestingModule({
-			imports: [
-				RouterTestingModule,
-				AppRoutingModule,
-				HttpClientTestingModule,
-				NoopAnimationsModule,
-				MatCardModule,
-				MatIconModule,
-				MatSnackBarModule,
-				MatButtonModule,
-				MatFormFieldModule,
-				MatInputModule,
-				MatSelectModule
-			],
-			declarations: [TestHostComponent, MeComponent, NotFoundComponent],
-			providers: [
-				{ provide: SessionService, useValue: sessionStub },
-				{ provide: UserService, useValue: userStub },
-				{ provide: MatSnackBar, useValue: { open: jest.fn() } },
-				AuthGuard,
-				UnauthGuard,
-				{ provide: StyleUtils, useValue: { lookupStyle: () => '', hasWrap: () => false, isFlowDirectionRTL: () => false, applyStyleToElement: () => {}, applyStyleToElements: () => {}, getFlowDirection: () => ['row', false] } }
-			]
-		}).compileComponents();
-
-		router = TestBed.inject(Router);
-
-		fixture = TestBed.createComponent(TestHostComponent);
-		fixture.detectChanges();
+		({ router, fixture } = await configureTestModule(sessionStub, userStub));
 	});
 
 	it('redirects /me to /login when not connected', async () => {
