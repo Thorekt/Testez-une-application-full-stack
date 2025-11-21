@@ -7,7 +7,7 @@ import { expect } from '@jest/globals';
 import { AppComponent } from './app.component';
 
 
-describe('AppComponent', () => {
+describe('AppComponent test unitaire', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
