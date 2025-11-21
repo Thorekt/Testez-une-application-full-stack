@@ -25,12 +25,6 @@ import { StyleUtils } from '@angular/flex-layout';
 @Component({ selector: 'test-host', template: '<router-outlet></router-outlet>' })
 class TestHostComponent {}
 
-@Component({ selector: 'app-sessions-stub', template: '<div>sessions page</div>' })
-class SessionsStubComponent {}
-
-@Component({ selector: 'app-login-stub', template: '<div>login page</div>' })
-class LoginStubComponent {}
-
 describe('Routing when connected integration', () => {
 	let fixture: ComponentFixture<TestHostComponent>;
 	let router: Router;
@@ -53,32 +47,18 @@ describe('Routing when connected integration', () => {
 				MatInputModule,
 				MatSelectModule
 			],
-			declarations: [TestHostComponent, SessionsStubComponent, LoginStubComponent, MeComponent, NotFoundComponent],
+			declarations: [TestHostComponent, MeComponent, NotFoundComponent],
 			providers: [
 				{ provide: SessionService, useValue: sessionStub },
 				{ provide: UserService, useValue: userStub },
 				{ provide: MatSnackBar, useValue: { open: jest.fn() } },
 				AuthGuard,
 				UnauthGuard,
-				// Minimal StyleUtils stub so flex-layout internals don't crash when templates include directives
 				{ provide: StyleUtils, useValue: { lookupStyle: () => '', hasWrap: () => false, isFlowDirectionRTL: () => false, applyStyleToElement: () => {}, applyStyleToElements: () => {}, getFlowDirection: () => ['row', false] } }
 			]
 		}).compileComponents();
 
 		router = TestBed.inject(Router);
-
-		// Replace lazy-loaded routes (AuthModule and SessionsModule) with simple stubs so we use the real AppRoutingModule
-		const config = router.config.map(r => {
-			if (r.path === '' || r.loadChildren) {
-				// map '' (auth) and any loadChildren to a stub component but keep guards
-				return { path: r.path, canActivate: r.canActivate, component: r.path === 'sessions' ? SessionsStubComponent : LoginStubComponent } as any;
-			}
-			if (r.path === 'sessions') {
-				return { ...r, component: SessionsStubComponent } as any;
-			}
-			return r;
-		});
-		router.resetConfig(config);
 
 		fixture = TestBed.createComponent(TestHostComponent);
 		fixture.detectChanges();
@@ -90,10 +70,10 @@ describe('Routing when connected integration', () => {
 		expect(fixture.nativeElement.querySelector('app-me')).toBeTruthy();
 	});
 
-	it('navigates to /sessions when connected (stubbed lazy module)', async () => {
+	it('navigates to /sessions when connected (lazy module)', async () => {
 		await router.navigate(['/sessions']);
 		fixture.detectChanges();
-		expect(fixture.nativeElement.querySelector('app-sessions-stub')).toBeTruthy();
+		expect(fixture.nativeElement.querySelector('app-list')).toBeTruthy();
 	});
 
 	it('renders 404 for unknown paths', async () => {
