@@ -15,29 +15,27 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { LoginComponent } from '../features/auth/components/login/login.component';
-import { SessionService } from 'src/app/services/session.service';
+import { RegisterComponent } from '../features/auth/components/register/register.component';
 import { AuthService } from '../features/auth/services/auth.service';
 import { AuthRoutingModule } from '../features/auth/auth-routing.module';
 
-@Component({ template: '<div>sessions stub</div>' })
-class StubSessionsComponent {}
+@Component({ template: '<div>login stub</div>' })
+class StubLoginComponent {}
 
-describe('LoginComponent Integration', () => {
-  let fixture: ComponentFixture<LoginComponent>;
-  let component: LoginComponent;
+describe('RegisterComponent Integration', () => {
+  let fixture: ComponentFixture<RegisterComponent>;
+  let component: RegisterComponent;
   let router: Router;
   let location: Location;
   let httpMock: HttpTestingController;
-  let sessionService: SessionService;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LoginComponent, StubSessionsComponent],
+      declarations: [RegisterComponent, StubLoginComponent],
       imports: [
         HttpClientTestingModule,
         RouterTestingModule.withRoutes([
-          { path: 'sessions', component: StubSessionsComponent }
+          { path: 'login', component: StubLoginComponent }
         ]),
         AuthRoutingModule,
         ReactiveFormsModule,
@@ -48,15 +46,14 @@ describe('LoginComponent Integration', () => {
         MatIconModule,
         MatButtonModule
       ],
-      providers: [SessionService, AuthService]
+      providers: [AuthService]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
     httpMock = TestBed.inject(HttpTestingController);
-    sessionService = TestBed.inject(SessionService);
 
     fixture.detectChanges();
   });
@@ -65,39 +62,42 @@ describe('LoginComponent Integration', () => {
     httpMock.verify();
   });
 
-  it('submits the form, logs in the user and redirects', async () => {
+  it('submits the form, registers the user and redirects to /login', async () => {
     // Given
     component.form.setValue({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User'
     });
 
     // When
     component.submit();
     fixture.detectChanges();
 
-    const req = httpMock.expectOne('api/auth/login');
-    req.flush({ id: 1, email: 'test@example.com' });
+    const req = httpMock.expectOne('api/auth/register');
+    req.flush({});
 
     // Then
-    expect(sessionService.isLogged).toBeTruthy();
     await fixture.whenStable();
-    expect(location.path()).toBe('/sessions');
+    expect(location.path()).toBe('/login');
   });
 
-  it('sets onError to true when login fails', () => {
+  it('sets onError to true when register fails', () => {
     // Given
     component.form.setValue({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
+      firstName: 'Test',
+      lastName: 'User'
     });
 
     // When
     component.submit();
     fixture.detectChanges();
 
-    const req = httpMock.expectOne('api/auth/login');
-    req.flush({ message: 'error' }, { status: 401, statusText: 'Unauthorized' });
+    const req = httpMock.expectOne('api/auth/register');
+    req.flush({}, { status: 400, statusText: 'Bad Request' });
 
     // Then
     fixture.detectChanges();
@@ -108,7 +108,9 @@ describe('LoginComponent Integration', () => {
     // Given
     component.form.setValue({
       email: '',
-      password: ''
+      password: '',
+      firstName: '',
+      lastName: ''
     });
     fixture.detectChanges();
 
