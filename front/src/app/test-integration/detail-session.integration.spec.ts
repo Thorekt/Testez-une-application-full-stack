@@ -81,7 +81,7 @@ describe('DetailComponent Integration', () => {
 
     expect(component.session).toEqual(session);
     expect(component.teacher).toEqual(teacher);
-    expect(component.isParticipate).toBe(true);
+    expect(component.isParticipate).toBeTruthy();
   });
 
   it('participate triggers API call and refreshes session', () => {

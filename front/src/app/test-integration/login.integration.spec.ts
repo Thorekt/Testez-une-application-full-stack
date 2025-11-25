@@ -109,6 +109,6 @@ describe('LoginComponent Integration', () => {
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
 
     // Then
-    expect(button.disabled).toBe(true);
+    expect(button.disabled).toBeTruthy();
   });
 });

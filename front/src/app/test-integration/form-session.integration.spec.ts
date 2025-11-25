@@ -38,10 +38,10 @@ describe('FormComponent (integration)', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-        declarations: [FormComponent, DummyComponent],
-        imports: [
+      declarations: [FormComponent, DummyComponent],
+      imports: [
         RouterTestingModule.withRoutes([
-            { path: 'sessions', component: DummyComponent }
+          { path: 'sessions', component: DummyComponent }
         ]),
         HttpClientTestingModule,
         ReactiveFormsModule,
@@ -52,11 +52,11 @@ describe('FormComponent (integration)', () => {
         MatSelectModule,
         MatSnackBarModule,
         NoopAnimationsModule
-        ],
-        providers: [
+      ],
+      providers: [
         { provide: SessionService, useValue: mockSessionService },
         SessionApiService
-        ]
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FormComponent);
@@ -68,7 +68,7 @@ describe('FormComponent (integration)', () => {
 
     // Empêche le warning "Navigation triggered outside Angular zone"
     jest.spyOn(router, 'navigate').mockResolvedValue(true as never);
-    });
+  });
 
 
   it('should create', () => {
