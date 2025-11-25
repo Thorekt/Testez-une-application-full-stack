@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { Location } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -16,9 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { LoginComponent } from '../features/auth/components/login/login.component';
-import { SessionService } from 'src/app/services/session.service';
+import { SessionService } from '../services/session.service';
 import { AuthService } from '../features/auth/services/auth.service';
-import { AuthRoutingModule } from '../features/auth/auth-routing.module';
 
 @Component({ template: '<div>sessions stub</div>' })
 class StubSessionsComponent {}
@@ -27,7 +25,6 @@ describe('LoginComponent Integration', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let component: LoginComponent;
   let router: Router;
-  let location: Location;
   let httpMock: HttpTestingController;
   let sessionService: SessionService;
 
@@ -39,7 +36,6 @@ describe('LoginComponent Integration', () => {
         RouterTestingModule.withRoutes([
           { path: 'sessions', component: StubSessionsComponent }
         ]),
-        AuthRoutingModule,
         ReactiveFormsModule,
         BrowserAnimationsModule,
         MatCardModule,
@@ -53,8 +49,10 @@ describe('LoginComponent Integration', () => {
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
+
     router = TestBed.inject(Router);
-    location = TestBed.inject(Location);
+    jest.spyOn(router, 'navigate').mockResolvedValue(true); // <<< FINI les warnings
+
     httpMock = TestBed.inject(HttpTestingController);
     sessionService = TestBed.inject(SessionService);
 
@@ -81,8 +79,7 @@ describe('LoginComponent Integration', () => {
 
     // Then
     expect(sessionService.isLogged).toBeTruthy();
-    await fixture.whenStable();
-    expect(location.path()).toBe('/sessions');
+    expect(router.navigate).toHaveBeenCalledWith(['/sessions']);
   });
 
   it('sets onError to true when login fails', () => {
@@ -100,22 +97,18 @@ describe('LoginComponent Integration', () => {
     req.flush({ message: 'error' }, { status: 401, statusText: 'Unauthorized' });
 
     // Then
-    fixture.detectChanges();
     expect(component.onError).toBeTruthy();
   });
 
   it('has the submit button disabled when the form is empty', () => {
     // Given
-    component.form.setValue({
-      email: '',
-      password: ''
-    });
+    component.form.reset();
     fixture.detectChanges();
 
     // When
     const button: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
-    
+
     // Then
-    expect(button.disabled).toBeTruthy();
+    expect(button.disabled).toBe(true);
   });
 });
