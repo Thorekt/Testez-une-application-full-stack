@@ -1,6 +1,52 @@
 # Yoga
 
-## Test
+## Back
+
+Répertoire back
+
+### Test
+
+Lancer tout les tests (integtation + unitaire) et generer les rapports (all, unitaire et intégration):
+
+> mvn clean verify
+
+Lancer les tests unitaires uniquement et generer le rapport
+
+> mvn clean test
+
+Lancer les tests d'intégrations uniquement et generer le rapport
+
+> mvn clean integration-test
+
+Les rapports sont disponibles dans le répertoire target/site :
+
+- jacoco-all -> rapport des tests combinés (integration + unitaire)
+- jacoco-it -> rapport des tests d'intégrations
+- jacoco-ut -> rapport des tests unitaires
+
+### Installation
+
+Build l'application :
+
+> mvn clean install
+
+Le fichier JAR ce trouve dans le repertoire target
+
+### Lancer le projet
+
+#### Mode développement
+
+> mvn spring-boot:run
+
+#### Lancement depuis fichier JAR
+
+> java -jar target\yoga-app-0.0.1-SNAPSHOT.jar
+
+## Front
+
+Répertoire front
+
+### Test
 
 Exécuter tout les tests (unitaire + integration) et générer un rapport commun
 
@@ -34,13 +80,13 @@ Dans le répertoire coverage il y a les repertoire suivant :
 - jest/integration -> contient le coverage intégration
 - jest/unitaire -> contient le coverage unitaire
 
-## Instalation
+### Instalation
 
 Install dependencies:
 
 > npm install
 
-## Lancement
+### Lancement
 
 Launch Front-end:
 
@@ -68,29 +114,3 @@ By default the admin account is:
 
 - login: yoga@studio.com
 - password: test!1234
-
-### Test
-
-#### E2E
-
-Launching e2e test:
-
-> npm run e2e
-
-Generate coverage report (you should launch e2e test before):
-
-> npm run e2e:coverage
-
-Report is available here:
-
-> front/coverage/lcov-report/index.html
-
-#### Unitary test
-
-Launching test:
-
-> npm run test
-
-for following change:
-
-> npm run test:watch
